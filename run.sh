@@ -2,4 +2,4 @@
 
 cd `dirname $0`
 
-bundle exec exe/xcmagg crowl
+bundle exec xcmagg crowl

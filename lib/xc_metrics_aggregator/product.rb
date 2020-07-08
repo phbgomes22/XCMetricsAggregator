@@ -47,7 +47,8 @@ module XcMetricsAggregator
     attr_reader :products
 
     def initialize
-        @products = Dir.glob(PRODUCT_PATH + "/*").map { |dir_path| Product.new dir_path }     
+        @products = Dir.glob(PRODUCT_PATH + "/*").map { |dir_path| Product.new dir_path }
+        puts PRODUCT_PATH
     end
 
     def targets(bundle_ids=[])
@@ -69,6 +70,8 @@ module XcMetricsAggregator
     end
 
     def each_product(bundle_ids=[])
+      puts "Entrou aqui"
+      puts PRODUCT_PATH
       targets(bundle_ids).each do |product|
         yield product
       end
@@ -86,16 +89,16 @@ module XcMetricsAggregator
     def headings(available_path)
       if available_path
         ['bundle id', 'status', 'raw data path']
-      else 
+      else
         ['bundle id', 'status']
       end
-      
+
     end
 
     def rows(available_path)
       rows = []
       products.each do |product|
-        status = 
+        status =
           if product.has_metrics?
             "has metrics"
           else
@@ -103,7 +106,7 @@ module XcMetricsAggregator
           end
         if available_path
           rows << [product.bundle_id, status, product.metrics_file.to_s]
-        else 
+        else
           rows << [product.bundle_id, status]
         end
       end

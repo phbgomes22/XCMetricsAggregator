@@ -17,6 +17,15 @@ module XcMetricsAggregator
   class Error < StandardError; end
   class CLI < Thor
 
+    option :bundle_ids, :aliases => "-b", type: :array, default: []
+    option :format, :aliases => "-f", type: :string, default: "ascii"
+    desc "teste", "Testing where things glue togheter"
+    def teste
+      each_product do |product|
+          puts File.join('/', 'Users', Etc.getlogin, 'Library', 'Developer' , 'Xcode', 'Products')
+      end
+    end
+
     desc "crowl", "Aggregate raw data of Xcode Organizer Metrics"
     def crowl
       Crawler.execute()
@@ -26,7 +35,7 @@ module XcMetricsAggregator
     option :available_path, type: :boolean, aliases: "-a", default: false
     option :format, aliases: "-f", type: :string, default: "ascii"
     def apps
-      service = ProductsService.new 
+      service = ProductsService.new
       puts service.structure(options[:available_path]).format Formatter.get_formatter(format)
     end
 
@@ -35,7 +44,7 @@ module XcMetricsAggregator
     desc "devices [-b <bundle id 1> <bundle id 2> ...] [-f <format>]", "Show available devices by builde id"
     def devices
       each_product do |product|
-        product.try_to_open do |json| 
+        product.try_to_open do |json|
           puts DevicesService
             .new(product.bundle_id, json)
             .structure
@@ -50,7 +59,7 @@ module XcMetricsAggregator
     desc "percentiles [-b <bundle id>,...] [-f <format>]", "Show available percentiles by builde id"
     def percentiles
       each_product do |product|
-        product.try_to_open do |json| 
+        product.try_to_open do |json|
           puts PercentilesService
             .new(product.bundle_id, json)
             .structure
@@ -60,7 +69,7 @@ module XcMetricsAggregator
       end
     end
 
-    
+
     option :bundle_id, :aliases => "-b", require: true
     option :format, :aliases => "-f", type: :string, default: "ascii"
     desc "categories -b <bundle id> [-f <format>]", "Show available categories by builde id"
@@ -72,7 +81,7 @@ module XcMetricsAggregator
           .format Formatter.get_formatter(format)
       end
     end
-    
+
     option :section, :aliases => "-s", require: true
     option :bundle_id, :aliases => "-b", require: true
     option :format, :aliases => "-f", type: :string, default: "ascii"
@@ -81,11 +90,11 @@ module XcMetricsAggregator
     option :percentile, :aliases => "-p", require: false
     desc "metrics -b <bundle id> -s <section> [-f <format>] [-d <device id>] [-p <percentile id>] [-v <version>]", "Show metrics data to a builde id"
     def metrics
-      product.try_to_open do |json| 
+      product.try_to_open do |json|
         structure = MetricsService
           .new(product.bundle_id, json)
           .structures(options[:section], options[:device], options[:percentile], options[:version])
-        
+
         puts structure.format Formatter.get_formatter(format)
         puts "\n\n"
       end
@@ -107,7 +116,7 @@ module XcMetricsAggregator
         .format Formatter.get_formatter(format)
     end
 
-    private 
+    private
     def format
       OutputFormat.all.find { |v| v == options[:format] }
     end
@@ -123,3 +132,6 @@ module XcMetricsAggregator
     end
   end
 end
+
+
+XcMetricsAggregator::CLI.start
